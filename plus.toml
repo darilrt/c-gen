@@ -1,0 +1,25 @@
+name = "c-gen"
+version = "0.1.0"
+description = ""
+author = ""
+email = ""
+url = ""
+license = ""
+requires = []
+subprojects = []
+
+[compiler]
+cxx = "g++"
+c = "gcc"
+standard = "c++20"
+flags = []
+includes = [ "include",]
+defines = []
+warnings = []
+debug = true
+
+[linker]
+type = "console-app"
+flags = []
+libdirs = []
+libs = []
