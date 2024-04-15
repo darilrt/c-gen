@@ -13,13 +13,13 @@ cxx = "g++"
 c = "gcc"
 standard = "c++20"
 flags = []
-includes = [ "include",]
+includes = ["include"]
 defines = []
 warnings = []
 debug = true
 
 [linker]
-type = "console-app"
+type = "static-lib"
 flags = []
 libdirs = []
 libs = []
