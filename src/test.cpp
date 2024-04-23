@@ -58,30 +58,49 @@ void test_block()
 
 void test_function()
 {
-    cgen::Function function;
+    cgen::Program program;
 
-    function.name = "main";
-    function.return_type = cgen::i32();
+    {
+        auto fn = std::make_unique<cgen::Function>();
+        fn->name = "main";
+        fn->return_type = cgen::i32();
 
-    function.parameters.push_back(cgen::decl_local("a0", cgen::i32()));
-    function.parameters.push_back(cgen::array_of(cgen::decl_local("a1", cgen::pointer_of(cgen::i8()))));
+        fn->parameters.push_back(cgen::decl_local("a0", cgen::i32()));
+        fn->parameters.push_back(cgen::array_of(cgen::decl_local("a1", cgen::pointer_of(cgen::i8()))));
 
-    function.body = std::make_unique<cgen::Block>();
-    auto block = function.body->as<cgen::Block>();
+        {
+            auto body = std::make_unique<cgen::Block>();
 
-    block->push(std::make_unique<cgen::DeclLocal>());
+            {
+                auto decl = std::make_unique<cgen::DeclLocal>();
+                decl->name = "l0";
+                decl->type = cgen::u8();
 
-    auto local = block->nodes[0]->as<cgen::DeclLocal>();
-    local->name = "l0";
-    local->type = cgen::u8();
+                body->push(std::move(decl));
 
-    block->push(std::make_unique<cgen::Return>());
+                auto ret = std::make_unique<cgen::Return>();
+                ret->node = cgen::literal(0);
 
-    auto ret = block->nodes[1]->as<cgen::Return>();
-    ret->node = cgen::literal(0);
+                body->push(std::move(ret));
+            }
+
+            fn->body = std::move(body);
+        }
+
+        program.nodes.push_back(std::move(fn));
+    }
+
+    {
+        auto fn = std::make_unique<cgen::Function>();
+        fn->name = "foo";
+        fn->return_type = cgen::i32();
+        fn->body = std::make_unique<cgen::Block>();
+
+        program.nodes.push_back(std::move(fn));
+    }
 
     cgen::CodeGenVisitor visitor;
-    assert(function.accept(&visitor) == "int main(int a0, char* a1[]){unsigned char l0;return 0;}");
+    assert(program.accept(&visitor) == "int main(int a0, char* a1[]){unsigned char l0;return 0;};int foo(){};");
 }
 
 void test_struct()
@@ -113,7 +132,7 @@ void test_pointer_work()
     assert(type->accept(&visitor) == "int*");
 }
 
-void test()
+int main()
 {
     RUN_TEST(test_primitive);
     RUN_TEST(test_declare_local);
@@ -121,10 +140,4 @@ void test()
     RUN_TEST(test_function);
     RUN_TEST(test_struct);
     RUN_TEST(test_call);
-}
-
-int main()
-{
-    test();
-    return 0;
 }

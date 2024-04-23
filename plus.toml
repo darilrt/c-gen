@@ -19,7 +19,7 @@ warnings = []
 debug = true
 
 [linker]
-type = "static-lib"
+type = "console-app"
 flags = []
 libdirs = []
 libs = []
